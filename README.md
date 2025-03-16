@@ -1,0 +1,2 @@
+# softwareeng_lecture_practice
+yazilim mühendisliği dersi uygulamaları
