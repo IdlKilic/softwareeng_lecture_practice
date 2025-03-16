@@ -26,3 +26,23 @@ try:
 except Exception as e:
     raise RuntimeError("Failed to initialize GPU strategy. Ensure TensorFlow is correctly installed and GPU is available.") from e
 
+
+# ---------------------- Model Oluşturma ----------------------
+def build_model(base_model):
+    with strategy.scope():
+        inputs = Input(shape=(224,224,3))
+        x = base_model(inputs, training=False)
+        x = GlobalAveragePooling2D()(x)
+        x = BatchNormalization()(x)
+        outputs = Dense(1, activation='sigmoid')(x)
+        return Model(inputs, outputs)
+
+with strategy.scope():
+    models = {
+        'resnet':      build_model(ResNet101(weights='imagenet', include_top=False)),
+        'vgg':         build_model(VGG16(weights='imagenet', include_top=False)),
+        'densenet':    build_model(DenseNet121(weights='imagenet', include_top=False)),
+        'efficientnet':build_model(EfficientNetB0(weights='imagenet', include_top=False))
+    }
+
+print("Models initialized.")
