@@ -26,15 +26,12 @@ try:
 except Exception as e:
     raise RuntimeError("Failed to initialize GPU strategy. Ensure TensorFlow is correctly installed and GPU is available.") from e
 
-<<<<<<< HEAD
 ---- Dizinler
 
 INPUT_DIR = '/kaggle/input/strokedata1k/stroke_data'
 DATASET_DIR = '/kaggle/working/dataset'
 OUTPUT_DIR = '/kaggle/working/results'
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-=======
+os.makedirs(OUTPUT_DIR, exist_ok=True
 
 # ---------------------- Model Oluşturma ----------------------
 def build_model(base_model):
@@ -55,4 +52,4 @@ with strategy.scope():
     }
 
 print("Models initialized.")
->>>>>>> 2373ce6bb31ba245e718595a3505d33f7dd6ac00
+
