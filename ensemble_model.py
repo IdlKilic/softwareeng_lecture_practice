@@ -25,7 +25,9 @@ try:
     print(f'Number of devices: {strategy.num_replicas_in_sync}')
 except Exception as e:
     raise RuntimeError("Failed to initialize GPU strategy. Ensure TensorFlow is correctly installed and GPU is available.") from e
+
 ---- Dizinler
+
 INPUT_DIR = '/kaggle/input/strokedata1k/stroke_data'
 DATASET_DIR = '/kaggle/working/dataset'
 OUTPUT_DIR = '/kaggle/working/results'
