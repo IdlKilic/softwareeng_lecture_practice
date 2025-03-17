@@ -33,6 +33,21 @@ DATASET_DIR = '/kaggle/working/dataset'
 OUTPUT_DIR = '/kaggle/working/results'
 os.makedirs(OUTPUT_DIR, exist_ok=True
 
+# ---------------------- Veri Hazırlama ----------------------
+def prepare_dataset():
+    for split in ['train', 'value', 'test']:
+        for cls in ['absent', 'present']:
+            os.makedirs(os.path.join(DATASET_DIR, split, cls), exist_ok=True)
+            src_img = os.path.join(INPUT_DIR, split, cls)
+            dst_img = os.path.join(DATASET_DIR, split, cls)
+            if os.path.exists(src_img):
+                for f in os.listdir(src_img):
+                    shutil.copy(os.path.join(src_img, f), dst_img)
+
+prepare_dataset()
+print("Dataset preparation completed.")
+
+
 # ---------------------- Model Oluşturma ----------------------
 def build_model(base_model):
     with strategy.scope():
