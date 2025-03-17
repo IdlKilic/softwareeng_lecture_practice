@@ -46,6 +46,31 @@ def prepare_dataset():
 
 prepare_dataset()
 print("Dataset preparation completed.")
+# ---------------------- Data Generator ----------------------
+BATCH_SIZE = 32 * strategy.num_replicas_in_sync
+IMG_SIZE = (224, 224)
+
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+    rotation_range=30,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.3,
+    horizontal_flip=True,
+    brightness_range=[0.8, 1.2]
+)
+val_test_datagen = ImageDataGenerator(rescale=1./255)
+
+def create_generator(directory, datagen, shuffle=True):
+    return datagen.flow_from_directory(
+        directory, target_size=IMG_SIZE, batch_size=BATCH_SIZE, class_mode='binary', shuffle=shuffle)
+
+train_gen = create_generator(os.path.join(DATASET_DIR, 'train'), train_datagen, shuffle=True)
+val_gen = create_generator(os.path.join(DATASET_DIR, 'value'), val_test_datagen, shuffle=False)
+test_gen = create_generator(os.path.join(DATASET_DIR, 'test'), val_test_datagen, shuffle=False)
+
+print("Data generators are ready.")
 
 
 # ---------------------- Model Oluşturma ----------------------
