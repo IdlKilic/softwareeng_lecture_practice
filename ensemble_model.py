@@ -93,3 +93,48 @@ with strategy.scope():
 
 print("Models initialized.")
 
+
+# ---------------------- Model Eğitimi (50 + 25 Epoch) ----------------------
+def train_model(model, base_model, name, train_gen, val_gen):
+    with strategy.scope():
+        # 1) İlk kısım: Base model'i dondur
+        base_model.trainable = False
+        lr_schedule = CosineDecay(initial_learning_rate=0.001, decay_steps=1000, alpha=0.0001)
+        model.compile(optimizer=Adam(learning_rate=lr_schedule),
+                      loss=BinaryCrossentropy(),
+                      metrics=['accuracy'])
+
+        model.fit(
+            train_gen,
+            validation_data=val_gen,
+            epochs=50,
+            callbacks=[
+                EarlyStopping(patience=5, restore_best_weights=True, monitor='val_loss'),
+                ModelCheckpoint(f'{name}_base.keras', save_best_only=True, monitor='val_loss'),
+            ]
+        )
+
+        # 2) İkinci kısım: Son 60 katmanı eğitilebilir hale getir
+        for layer in base_model.layers[-60:]:
+            layer.trainable = True
+
+        model.compile(optimizer=Adam(learning_rate=1e-5),
+                      loss=BinaryCrossentropy(),
+                      metrics=['accuracy'])
+
+        model.fit(
+            train_gen,
+            validation_data=val_gen,
+            epochs=25,
+            callbacks=[
+                EarlyStopping(patience=5, restore_best_weights=True, monitor='val_loss'),
+                ModelCheckpoint(f'{name}_tuned.keras', save_best_only=True, monitor='val_loss'),
+            ]
+        )
+    return model
+for name, model in models.items():
+    print(f'\nTraining {name}\n')
+    base_model = model.layers[1]  # The second layer is the base model
+    models[name] = train_model(model, base_model, name, train_gen, val_gen)
+
+
